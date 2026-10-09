@@ -4,7 +4,11 @@ See where a suspicious email really came from.
 
 Email X-Ray takes the raw source of an email (pasted headers or a `.eml` file) and turns it into a readable investigation: the server-by-server route it took, whether the sender checks out, where every link actually goes, and a plain-English verdict. It runs entirely in the browser. Nothing you paste leaves the page.
 
-**Live demo:** https://claude.ai/artifact/TEYtsFe6EdfkbJsN2i8Qak
+**Live demo:** https://r3d-4ct3d.github.io/email-xray/ (full features including the AI second read: https://claude.ai/artifact/TEYtsFe6EdfkbJsN2i8Qak)
+
+| Standard mode | Investigator mode |
+|---|---|
+| ![Standard mode: verdict, top reasons, and delivery route](docs/standard-mode.png) | ![Investigator mode: case header, defanged IOCs, and MITRE ATT&CK mapping](docs/investigator-mode.png) |
 
 ## Features
 
