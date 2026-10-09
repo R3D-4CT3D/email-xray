@@ -5,7 +5,7 @@ Work top to bottom. Each phase ends in something you can demo.
 ## Phase 0: Set up the repo (30 minutes)
 
 1. Create a GitHub repo named `email-xray` and push this folder.
-2. Turn on GitHub Pages (Settings, Pages, deploy from `main`, folder `/src`) so the tool has a public URL outside claude.ai.
+2. Turn on GitHub Pages (Settings, Pages, Source: GitHub Actions) so the tool has a public URL outside claude.ai. `.github/workflows/pages.yml` publishes `src/` on every push to `main`.
 3. Add screenshots of Standard and Investigator mode to `docs/` and link them in the README.
 4. Pin the repo on your GitHub profile.
 
