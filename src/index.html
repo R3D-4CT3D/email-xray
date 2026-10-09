@@ -46,6 +46,9 @@ a{color:var(--glow)}
 textarea{width:100%;min-height:190px;resize:vertical;border:0;background:transparent;color:var(--ink);font-size:13px;line-height:1.55;padding:6px}
 textarea:focus{outline:none}
 .input:focus-within{border-color:var(--glow)}
+.input{position:relative}
+body.dragging .input{border:2px dashed var(--glow);padding:13px}
+body.dragging .input::after{content:"Drop the .eml or .msg file";position:absolute;inset:0;display:grid;place-items:center;border-radius:12px;background:var(--panel);color:var(--glow);font-weight:700;font-size:1.1rem}
 .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;align-items:center}
 button,.btn{font:inherit;font-weight:600;font-size:.95rem;border-radius:10px;padding:11px 18px;cursor:pointer;border:1.5px solid var(--ink);background:transparent;color:var(--ink)}
 button.primary{background:var(--ink);color:var(--bg)}
@@ -134,8 +137,8 @@ footer{margin-top:64px;color:var(--muted);font-size:.9rem;border-top:1px solid v
 .modebar button{border:0;border-radius:0;padding:9px 18px;font-size:.9rem}
 .modebar button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 body:not(.inv) .inv-only{display:none}
-body:not(.has-dl) .need-dl{display:none}
 body:not(.has-ai) .need-ai{display:none}
+body.has-ai .no-ai{display:none}
 body.inv section.block{margin-top:28px;padding-top:18px}
 body.inv section.block > .sub{display:none}
 body.inv .verdict h2{font-size:1.8rem}
@@ -183,16 +186,17 @@ td a{color:var(--glow)}
   </div>
 
   <div class="input">
-    <label for="raw" class="fine" style="margin:0 6px 6px;display:block">Raw email, headers included</label>
+    <label for="raw" class="fine" style="margin:0 6px 6px;display:block">Raw email, headers included. You can also drop a .eml or .msg file here.</label>
     <textarea id="raw" spellcheck="false" placeholder="Received: from mail.example.com ...&#10;From: ...&#10;Subject: ...&#10;&#10;(message body)"></textarea>
   </div>
   <div class="actions">
     <button class="primary" id="go">Scan email</button>
-    <button id="file-btn">Open .eml file</button>
+    <button id="file-btn">Open .eml or .msg file</button>
     <button id="sample">Try a sample phish</button>
     <input type="file" id="file" accept=".eml,.txt,.msg,message/rfc822" hidden>
   </div>
   <p class="error" id="err" hidden></p>
+  <p class="fine" id="note" hidden></p>
 
   <details class="help">
     <summary>How to get the raw source</summary>
@@ -201,6 +205,7 @@ td a{color:var(--glow)}
       <li>Outlook (web): open the email, click the three-dot menu, then View, then View message source.</li>
       <li>Apple Mail (Mac): View, then Message, then Raw Source.</li>
       <li>Yahoo Mail: click More, then View raw message.</li>
+      <li>Outlook (desktop): drag the email from your inbox to your desktop to save it as a .msg file, then drop it here.</li>
       <li>Most phone mail apps hide this, so a computer is easiest. You can also save the email as a .eml file and open it here.</li>
     </ul>
   </details>
@@ -796,7 +801,7 @@ function setMode(m){
 }
 const CAP = {dl:null, sample:null};
 if (window.claude && typeof window.claude.use === 'function'){
-  window.claude.use('downloads').then(d => { CAP.dl = d; if (d) document.body.classList.add('has-dl'); }).catch(() => {});
+  window.claude.use('downloads').then(d => { CAP.dl = d; }).catch(() => {});
   window.claude.use('sample').then(sm => { CAP.sample = sm; if (sm) document.body.classList.add('has-ai'); }).catch(() => {});
 }
 
@@ -975,8 +980,19 @@ async function copyText(t, btn){
   }
   flash(btn, ok ? 'Copied' : 'Copy blocked here');
 }
+const MIME = {csv:'text/csv', json:'application/json', md:'text/markdown'};
+function blobDownload(name, data){
+  const url = URL.createObjectURL(new Blob([data], {type:(MIME[name.split('.').pop()] || 'text/plain') + ';charset=utf-8'}));
+  const a = el('a', {href:url, download:name, hidden:''});
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 async function saveFile(name, data, btn){
-  if (!CAP.dl) return;
+  // Inside claude.ai the sandbox blocks <a download>, so use the runtime's save dialog there.
+  if (!CAP.dl){
+    try { blobDownload(name, data); flash(btn, 'Downloaded'); } catch(e){ flash(btn, 'Couldn\'t save'); }
+    return;
+  }
   try { const res = await CAP.dl.save({filename:name, data}); if (res && res.status === 'saved') flash(btn, 'Saved'); }
   catch(e){
     const c = e && e.code;
@@ -1037,9 +1053,9 @@ function invBlocks(r){
   // indicators
   const copyBtn = el('button', {text:'Copy defanged'});
   copyBtn.addEventListener('click', () => copyText(r.iocs.map(i => defang(i.type, i.value)).join('\n'), copyBtn));
-  const csvBtn = el('button', {class:'need-dl', text:'Export CSV'});
+  const csvBtn = el('button', {text:'Export CSV'});
   csvBtn.addEventListener('click', () => saveFile(`${r.caseId}-iocs.csv`, iocCSV(r), csvBtn));
-  const stixBtn = el('button', {class:'need-dl', text:'Export STIX 2.1'});
+  const stixBtn = el('button', {text:'Export STIX 2.1'});
   stixBtn.addEventListener('click', () => saveFile(`${r.caseId}-stix.json`, stixBundle(r), stixBtn));
   blocks.push(block(`Indicators (${r.iocs.length})`, null,
     el('div', {class:'toolrow'}, copyBtn, csvBtn, stixBtn),
@@ -1081,10 +1097,16 @@ function invBlocks(r){
     el('div', {class:'toolrow'}, aiBtn, stopBtn), aiOut);
   aiBlock.classList.add('need-ai');
   blocks.push(aiBlock);
+  const noAiBlock = block('AI second read', null,
+    el('p', {class:'note'}, 'A Claude read on intent and social engineering is available in the ',
+      el('a', {href:'https://claude.ai/artifact/TEYtsFe6EdfkbJsN2i8Qak', target:'_blank', rel:'noopener', text:'claude.ai version'}),
+      ' of Email X-Ray. Support on this site is planned.'));
+  noAiBlock.classList.add('no-ai');
+  blocks.push(noAiBlock);
   // report
   const repCopy = el('button', {text:'Copy report'});
   repCopy.addEventListener('click', () => copyText(reportMD(r), repCopy));
-  const repSave = el('button', {class:'need-dl primary', text:'Download report (.md)'});
+  const repSave = el('button', {class:'primary', text:'Download report (.md)'});
   repSave.addEventListener('click', () => saveFile(`${r.caseId}-report.md`, reportMD(r), repSave));
   blocks.push(block('Case report', null,
     el('p', {class:'note', text:'Everything on this page as one Markdown write-up, with indicators defanged. Includes the AI read if you ran it.'}),
@@ -1156,10 +1178,88 @@ att,
 '--==outer==--',''].join('\n');
 }
 
+/* ---------- .msg (Outlook) ---------- */
+// The parser is a 570 KB vendored bundle (tools/msgreader), so it only loads when a .msg is opened.
+let msgReaderLoad = null;
+function loadMsgReader(){
+  return msgReaderLoad || (msgReaderLoad = new Promise((ok, fail) => {
+    const s = el('script', {src:'vendor/msgreader.min.js'});
+    s.onload = () => window.MsgReader ? ok(window.MsgReader) : fail(new Error('msgreader'));
+    s.onerror = () => { msgReaderLoad = null; s.remove(); fail(new Error('msgreader')); };
+    document.head.append(s);
+  }));
+}
+function bytesB64(u8){
+  let bin = '';
+  for (let i=0;i<u8.length;i+=0x8000) bin += String.fromCharCode.apply(null, u8.subarray(i, i+0x8000));
+  return btoa(bin).replace(/(.{76})/g,'$1\n');
+}
+const utf8B64 = s => bytesB64(new TextEncoder().encode(s));
+const encWord = s => /^[\x20-\x7e]*$/.test(s) ? s : '=?UTF-8?B?' + utf8B64(s).replace(/\n/g,'') + '?=';
+const isOle = u8 => u8.length > 8 && u8[0] === 0xd0 && u8[1] === 0xcf && u8[2] === 0x11 && u8[3] === 0xe0;
+// Turn an Outlook .msg back into raw RFC 822 text so analyze() can treat it like any .eml.
+function msgToRaw(MsgReader, buf){
+  const rd = new MsgReader(buf);
+  const d = rd.getFileData();
+  if (d.error) throw new Error('msg');
+  const head = [];
+  if (d.headers){
+    // Original transport headers: keep all of them except the MIME ones, which describe a body we rebuild below.
+    let skip = false;
+    for (const line of d.headers.replace(/\r\n?/g,'\n').split('\n')){
+      if (!line.trim()){ if (head.length) break; continue; }
+      if (/^[ \t]/.test(line)){ if (!skip) head.push(line); continue; }
+      skip = /^(content-type|content-transfer-encoding|mime-version):/i.test(line);
+      if (!skip) head.push(line);
+    }
+  } else {
+    const addr = (name, email) => email ? (name && name !== email ? `${encWord(name)} <${email}>` : `<${email}>`) : '';
+    const from = addr(d.senderName, d.senderSmtpAddress || d.senderEmail);
+    const to = (d.recipients || []).filter(x => x.recipType !== 'cc' && x.recipType !== 'bcc')
+      .map(x => addr(x.name, x.smtpAddress || x.email)).filter(Boolean).join(', ');
+    if (from) head.push('From: ' + from);
+    if (to) head.push('To: ' + to);
+    if (d.subject) head.push('Subject: ' + encWord(d.subject));
+    const date = d.clientSubmitTime || d.messageDeliveryTime || d.creationTime;
+    if (date) head.push('Date: ' + date);
+  }
+  const B = '==xray-msg-' + Math.random().toString(36).slice(2) + '==';
+  const parts = [];
+  if (d.body) parts.push(['Content-Type: text/plain; charset=UTF-8', 'Content-Transfer-Encoding: base64', '', utf8B64(d.body)].join('\n'));
+  for (const a of d.attachments || []){
+    let x; try { x = rd.getAttachment(a); } catch(e){ continue; }
+    if (!x || !x.content) continue;
+    const name = encWord((x.fileName || a.fileName || a.name || 'attachment').replace(/["\r\n]/g,''));
+    parts.push([`Content-Type: ${a.attachMimeTag || 'application/octet-stream'}; name="${name}"`,
+      `Content-Disposition: attachment; filename="${name}"`, 'Content-Transfer-Encoding: base64', '', bytesB64(x.content)].join('\n'));
+  }
+  head.push('MIME-Version: 1.0', `Content-Type: multipart/mixed; boundary="${B}"`);
+  const raw = head.join('\n') + '\n\n' + parts.map(p => `--${B}\n${p}`).join('\n') + `\n--${B}--\n`;
+  return {raw, note: d.headers ? '' : 'This .msg file has no original internet headers. It is probably a draft or a sent item, so the route and authentication can\'t be checked. Open the copy that arrived in the inbox for a full scan.'};
+}
+
 /* ---------- wiring ---------- */
+let loaded = null; // {raw, note} for the last opened file, so its note stays while that text is scanned
+async function loadFile(f){
+  const err = $('#err'); err.hidden = true;
+  try {
+    const buf = new Uint8Array(await f.arrayBuffer());
+    let out;
+    if (/\.msg$/i.test(f.name) || isOle(buf)){
+      if (!isOle(buf)) throw new Error('msg');
+      out = msgToRaw(await loadMsgReader(), buf);
+    } else out = {raw: new TextDecoder('utf-8').decode(buf), note: ''};
+    loaded = out; $('#raw').value = out.raw; run();
+  } catch(e){
+    console.error(e);
+    err.textContent = /\.msg$/i.test(f.name) ? 'This .msg file couldn\'t be read. Try saving the email again from Outlook, or copy its raw source instead.' : 'This file couldn\'t be read.';
+    err.hidden = false;
+  }
+}
 async function run(){
   const raw = $('#raw').value;
   const err = $('#err'); err.hidden = true;
+  const note = $('#note'); note.textContent = loaded && loaded.raw === raw ? loaded.note : ''; note.hidden = !note.textContent;
   if (!raw.trim()){ err.textContent = 'Paste the raw email first, headers included. See "How to get the raw source" below.'; err.hidden = false; return; }
   try { const r = analyze(raw); await enrich(r, raw); render(r); }
   catch(e){
@@ -1173,10 +1273,20 @@ $('#sample').addEventListener('click', () => { $('#raw').value = sample(); run()
 $('#file-btn').addEventListener('click', () => $('#file').click());
 $('#file').addEventListener('change', e => {
   const f = e.target.files[0]; if (!f) return;
-  const rd = new FileReader();
-  rd.onload = () => { $('#raw').value = rd.result; run(); };
-  rd.readAsText(f);
+  loadFile(f);
   e.target.value = '';
+});
+// Drop anywhere on the page. Every drop is intercepted so the browser never opens a dropped file itself.
+const hasFiles = e => e.dataTransfer && [...e.dataTransfer.types].includes('Files');
+let dragDepth = 0;
+window.addEventListener('dragenter', e => { if (!hasFiles(e)) return; e.preventDefault(); dragDepth++; document.body.classList.add('dragging'); });
+window.addEventListener('dragover', e => { if (!hasFiles(e)) return; e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+window.addEventListener('dragleave', e => { if (!hasFiles(e)) return; if (--dragDepth <= 0){ dragDepth = 0; document.body.classList.remove('dragging'); } });
+window.addEventListener('drop', e => {
+  if (!hasFiles(e) && e.target === $('#raw')) return; // plain text dragged into the box
+  e.preventDefault(); dragDepth = 0; document.body.classList.remove('dragging');
+  const f = e.dataTransfer && e.dataTransfer.files[0];
+  if (f) loadFile(f);
 });
 </script>
 </body>

@@ -2,21 +2,21 @@
 
 Work top to bottom. Each phase ends in something you can demo.
 
-## Phase 0: Set up the repo (30 minutes)
+## Phase 0: Set up the repo (30 minutes) [done]
 
 1. Create a GitHub repo named `email-xray` and push this folder.
 2. Turn on GitHub Pages (Settings, Pages, Source: GitHub Actions) so the tool has a public URL outside claude.ai. `.github/workflows/pages.yml` publishes `src/` on every push to `main`.
 3. Add screenshots of Standard and Investigator mode to `docs/` and link them in the README.
 4. Pin the repo on your GitHub profile.
 
-## Phase 1: Make it standalone (1 evening)
+## Phase 1: Make it standalone (1 evening) [done]
 
 The current file was built for the claude.ai artifact runtime. Make it work anywhere.
 
 1. Replace `CAP.dl.save(...)` with a standard Blob download (`URL.createObjectURL` plus a temporary `<a download>`), so CSV, STIX, and report exports work on GitHub Pages.
 2. Hide the AI second read when `window.claude` is missing (already handled), and add a note that it moves to the backend in Phase 4.
 3. Add a drag-and-drop zone for `.eml` files.
-4. Add `.msg` (Outlook) support with a small library such as `@kenjiuno/msgreader`.
+4. Add `.msg` (Outlook) support with a small library such as `@kenjiuno/msgreader`. Bundled to `src/vendor/` by `tools/msgreader/` and lazy-loaded. When Phase 2 moves to Vite, import it as a normal dependency and delete the vendored copy.
 
 ## Phase 2: Split the code and add tests (1 weekend)
 

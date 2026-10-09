@@ -2,7 +2,7 @@
 
 See where a suspicious email really came from.
 
-Email X-Ray takes the raw source of an email (pasted headers or a `.eml` file) and turns it into a readable investigation: the server-by-server route it took, whether the sender checks out, where every link actually goes, and a plain-English verdict. It runs entirely in the browser. Nothing you paste leaves the page.
+Email X-Ray takes the raw source of an email (pasted headers, a `.eml` file, or an Outlook `.msg` file) and turns it into a readable investigation: the server-by-server route it took, whether the sender checks out, where every link actually goes, and a plain-English verdict. It runs entirely in the browser. Nothing you paste leaves the page.
 
 **Live demo:** https://r3d-4ct3d.github.io/email-xray/ (full features including the AI second read: https://claude.ai/artifact/TEYtsFe6EdfkbJsN2i8Qak)
 
@@ -38,15 +38,17 @@ No build step. Open `src/index.html` in any modern browser, or serve the folder:
 npx serve src
 ```
 
-Click **Try a sample phish**, or open `samples/paypal-lookalike.eml`.
+Click **Try a sample phish**, or drag `samples/paypal-lookalike.eml` onto the page.
 
-> Outside claude.ai, the CSV/STIX/report download buttons and the AI second read are hidden because they use the claude.ai artifact runtime. Copy buttons still work. Replacing these with standard browser downloads is step 1 in `NEXT_STEPS.md`.
+> The AI second read needs the claude.ai artifact runtime, so other hosts show a link to the claude.ai version instead. Moving it to a backend is Phase 4 in `NEXT_STEPS.md`.
 
 ## Project layout
 
 ```
 email-xray/
   src/index.html        the whole app (HTML, CSS, JS in one file)
+  src/vendor/           .msg parser bundle, loaded only when a .msg is opened
+  tools/msgreader/      how that bundle is built
   samples/              test emails (.eml)
   docs/                 screenshots and write-ups go here
   NEXT_STEPS.md         roadmap
@@ -61,6 +63,7 @@ email-xray/
 | Outlook (web) | Three-dot menu, **View**, **View message source** |
 | Apple Mail | **View**, **Message**, **Raw Source** |
 | Yahoo Mail | **More**, **View raw message** |
+| Outlook (desktop) | Drag the email to your desktop to save a `.msg`, then drop it on the page |
 
 ## Limits
 
