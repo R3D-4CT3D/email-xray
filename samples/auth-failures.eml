@@ -1,0 +1,15 @@
+Received: from mx.forged.example (mx.forged.example [203.0.113.90])
+        by mx.example.com with ESMTP id r3
+        for <you@example.com>; Thu, 8 Oct 2026 08:00:05 +0000
+Authentication-Results: mx.example.com;
+       spf=fail (sender IP is 203.0.113.90) smtp.mailfrom=billing@examplebank.com;
+       dkim=fail (signature did not verify) header.d=examplebank.com;
+       dmarc=fail (p=REJECT) header.from=examplebank.com
+DKIM-Signature: v=1; a=rsa-sha256; d=examplebank.com; s=k1; bh=AAAA; b=BBBB
+From: Example Bank <billing@examplebank.com>
+To: you@example.com
+Subject: Statement ready
+Date: Thu, 8 Oct 2026 08:00:00 +0000
+Content-Type: text/plain; charset=UTF-8
+
+Your statement is ready.

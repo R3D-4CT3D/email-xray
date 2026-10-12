@@ -1,0 +1,15 @@
+Received: from mail.arnazon-billing.com (mail.arnazon-billing.com [203.0.113.81])
+        by mx.example.com with ESMTP id r2
+        for <you@example.com>; Wed, 7 Oct 2026 11:00:05 +0000
+Authentication-Results: mx.example.com;
+       spf=pass smtp.mailfrom=orders@arnazon-billing.com;
+       dkim=pass header.d=arnazon-billing.com;
+       dmarc=pass header.from=arnazon-billing.com
+From: Amazon <orders@arnazon-billing.com>
+To: you@example.com
+Subject: Your order could not be shipped
+Date: Wed, 7 Oct 2026 11:00:00 +0000
+Message-ID: <o1@arnazon-billing.com>
+Content-Type: text/plain; charset=UTF-8
+
+We could not ship your order. Please contact us.

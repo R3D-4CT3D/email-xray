@@ -16,15 +16,21 @@ The current file was built for the claude.ai artifact runtime. Make it work anyw
 1. Replace `CAP.dl.save(...)` with a standard Blob download (`URL.createObjectURL` plus a temporary `<a download>`), so CSV, STIX, and report exports work on GitHub Pages.
 2. Hide the AI second read when `window.claude` is missing (already handled), and add a note that it moves to the backend in Phase 4.
 3. Add a drag-and-drop zone for `.eml` files.
-4. Add `.msg` (Outlook) support with a small library such as `@kenjiuno/msgreader`. Bundled to `src/vendor/` by `tools/msgreader/` and lazy-loaded. When Phase 2 moves to Vite, import it as a normal dependency and delete the vendored copy.
+4. Add `.msg` (Outlook) support with `@kenjiuno/msgreader`, lazy-loaded. (Moved from a vendored bundle to an npm import in Phase 2.)
 
-## Phase 2: Split the code and add tests (1 weekend)
+## Phase 2: Split the code and add tests (1 weekend) [in progress]
 
-1. Move to a Vite project: `src/parse/` (MIME, headers, Received), `src/checks/` (sender, auth, links, attachments, language), `src/export/` (IOC, STIX, report), `src/ui/`.
-2. Add Vitest. Write one test per check using `.eml` fixtures in `samples/`.
-3. Build a fixture corpus: 10 real phish from your spam folder (scrub your own address), 10 legitimate emails (bank, Amazon, newsletters) to catch false positives. Never commit real people's personal data.
-4. Track false positives and tune lookalike detection and scoring weights against the corpus.
-5. Add GitHub Actions to run tests on every push.
+1. [done] Move to a Vite project: `src/parse/` (MIME, headers, Received, .msg), `src/checks/` (sender, auth, route, links, attachments, language, lookalike domains), `src/export/` (IOC, ATT&CK, STIX, report, hashes), `src/ui/`. The vendored msgreader bundle is gone; it is an npm dependency loaded with `import()`.
+2. [done] Add Vitest. One test per check using `.eml` fixtures in `samples/`, plus a `.msg` fixture and a page smoke test.
+3. Build a fixture corpus: 10 real phish from your spam folder (scrub your own address), 10 legitimate emails (bank, Amazon, newsletters) to catch false positives. Never commit real people's personal data. The synthetic fixtures are in; the real ones are still to do.
+4. Track false positives and tune lookalike detection and scoring weights against the corpus. Leads found while writing tests:
+   - The "stuffs the brand into an unrelated domain" rule matches plain substrings, so `purchase-orders.com` reads as Chase, `officedepot.com` and `outlookindia.com` as Microsoft, `appleton` as Apple, all at high severity. Tracked as `test.fails` cases in `tests/domains.test.js`.
+   - An email with heavy pressure language but no links or attachments (business email compromise, gift card scams) caps at 20 points, "A few oddities". See `language-pressure.eml`.
+   - A `<form action>` in the body is extracted but not flagged by itself.
+   - A legitimate sender's own domains and IPs are listed as IOCs. Consider leaving them out when DMARC passes and nothing else fires.
+5. [done] GitHub Actions: `test.yml` runs tests and a build on every push and PR. `pages.yml` now tests, builds, and deploys `dist/`.
+
+Fixed along the way: RFC 2231 attachment names (`filename*=UTF-8''scan.html` showed as `UTF-8''scan.html`), and the Markdown report leaking live IPs, DKIM domains, and the raw Authentication-Results header without defanging.
 
 ## Phase 3: Backend for network lookups (1 to 2 weekends)
 

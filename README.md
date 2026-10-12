@@ -32,13 +32,16 @@ Email X-Ray takes the raw source of an email (pasted headers, a `.eml` file, or 
 
 ## Run it locally
 
-No build step. Open `src/index.html` in any modern browser, or serve the folder:
+Needs Node 18 or newer.
 
 ```bash
-npx serve src
+npm install
+npm run dev      # dev server with hot reload
+npm test         # Vitest suite against the fixtures in samples/
+npm run build    # static site in dist/, which is what GitHub Pages serves
 ```
 
-Click **Try a sample phish**, or drag `samples/paypal-lookalike.eml` onto the page.
+Click **Try a sample phish**, or drag any file from `samples/` onto the page.
 
 > The AI second read needs the claude.ai artifact runtime, so other hosts show a link to the claude.ai version instead. Moving it to a backend is Phase 4 in `NEXT_STEPS.md`.
 
@@ -46,14 +49,23 @@ Click **Try a sample phish**, or drag `samples/paypal-lookalike.eml` onto the pa
 
 ```
 email-xray/
-  src/index.html        the whole app (HTML, CSS, JS in one file)
-  src/vendor/           .msg parser bundle, loaded only when a .msg is opened
-  tools/msgreader/      how that bundle is built
-  samples/              test emails (.eml)
-  docs/                 screenshots and write-ups go here
-  NEXT_STEPS.md         roadmap
-  CLAUDE.md             context for Claude Code sessions
+  src/
+    index.html, style.css, main.js   page shell and wiring
+    analyze.js        analyze(raw): parse, run every check, score
+    enrich.js         hashes, case ID, IOCs, ATT&CK
+    data.js           brands, risky hosts and file types, pressure phrases
+    parse/            MIME, headers, Received lines, Outlook .msg
+    checks/           sender, auth, route, links, attachments, language, lookalike domains
+    export/           IOCs and defanging, ATT&CK, STIX 2.1, Markdown report, hashes
+    ui/               rendering, Investigator blocks, view mode, host integration
+  tests/              one Vitest file per check, plus exports, .msg, and a page smoke test
+  samples/            fixture emails (see samples/README.md)
+  docs/               screenshots and write-ups
+  NEXT_STEPS.md       roadmap
+  CLAUDE.md           context for Claude Code sessions
 ```
+
+The `.msg` parser (`@kenjiuno/msgreader`) is split into its own chunk and only downloads when a `.msg` file is opened. Licenses for bundled packages are written to `dist/THIRD_PARTY_LICENSES.txt` at build time.
 
 ## How to get raw email source
 
