@@ -38,5 +38,11 @@ export function buildIOCs(r){
   });
   return out;
 }
-const csvCell = v => /[",\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v;
+// Values come from the email itself. A leading = + - @ (or tab/CR) would run as a formula in Excel or Sheets,
+// so prefix a quote to keep it text (OWASP CSV injection guidance).
+const csvCell = v => {
+  v = String(v ?? '');
+  if (/^[=+\-@\t\r]/.test(v)) v = "'" + v;
+  return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v;
+};
 export const iocCSV = r => ['type,value,defanged,context', ...r.iocs.map(i => [i.type, i.value, defang(i.type, i.value), i.context].map(csvCell).join(','))].join('\n');

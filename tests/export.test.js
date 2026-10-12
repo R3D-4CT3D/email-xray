@@ -63,3 +63,17 @@ describe('sample phish case', async () => {
     expect(inds.every(o => o.pattern.startsWith('[') && o.indicator_types[0] === 'malicious-activity')).toBe(true);
   });
 });
+
+test('CSV export neutralizes spreadsheet formulas from attacker-controlled values', () => {
+  const r = {iocs:[
+    {type:'filename', value:'=HYPERLINK("http://evil.example","Click")', context:'Attachment'},
+    {type:'filename', value:'+cmd|calc', context:'@SUM(1)'},
+    {type:'filename', value:'-2+3', context:'Attachment'},
+    {type:'domain', value:'evil.example', context:'Link host'},
+  ]};
+  const rows = iocCSV(r).split('\n').slice(1);
+  expect(rows[0]).toBe(`filename,"'=HYPERLINK(""http://evil.example"",""Click"")","'=HYPERLINK(""http://evil.example"",""Click"")",Attachment`);
+  expect(rows[1]).toBe("filename,'+cmd|calc,'+cmd|calc,'@SUM(1)");
+  expect(rows[2]).toBe("filename,'-2+3,'-2+3,Attachment");
+  expect(rows[3]).toBe('domain,evil.example,evil[.]example,Link host');
+});
