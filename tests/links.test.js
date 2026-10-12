@@ -20,7 +20,7 @@ test('every link trick in the fixture is caught', () => {
 
 test('form actions are collected, mailto links are not', () => {
   const r = scan('links-tricks.eml');
-  expect(r.links.find(l => l.href === 'https://collect.example.net/submit').shown).toBe('Form submits to');
+  expect(r.links.find(l => l.href === 'https://collect.example.net/submit')).toMatchObject({shown:'Form submits to', form:true, password:false});
   expect(r.links.some(l => l.href.startsWith('mailto:'))).toBe(false);
 });
 
@@ -32,4 +32,13 @@ test('links are sorted riskiest first', () => {
 
 test('matching link text on a legitimate email is clean', () => {
   expect(scan('legit-newsletter.eml').links.every(l => l.flags.length === 0)).toBe(true);
+});
+
+test('forms in the body are flagged, and a password field makes it high risk', () => {
+  const r = scan('form-harvest.eml');
+  const login = r.links.find(l => l.href === 'https://collect.mailbox-quota.example/save');
+  expect(login).toMatchObject({form:true, password:true});
+  expect(login.flags[0]).toEqual(['high', 'A sign-in form built into the email. Whatever you type, including your password, goes to collect.mailbox-quota.example']);
+  const survey = r.links.find(l => l.href === 'https://survey.it-helpdesk.example/rate');
+  expect(survey.flags).toEqual([['medium', 'A form built into the email sends whatever you type to survey.it-helpdesk.example']]);
 });

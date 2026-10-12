@@ -9,7 +9,7 @@ function hostFromText(t){
 }
 export function extractLinks(texts, htmls){
   const links = []; const seen = new Set();
-  const add = (href, shown) => {
+  const add = (href, shown, extra) => {
     if (!href) return;
     href = href.trim();
     if (/^(mailto|tel|cid):/i.test(href) || href.startsWith('#')) return;
@@ -17,13 +17,14 @@ export function extractLinks(texts, htmls){
     if (!/^(https?:|data:|javascript:|\/\/)/i.test(href)) return;
     const key = href + '|' + shown;
     if (seen.has(key)) return; seen.add(key);
-    links.push({href, shown});
+    links.push({href, shown, ...extra});
   };
   let htmlText = '';
   for (const h of htmls){
     const doc = new DOMParser().parseFromString(h, 'text/html');
     doc.querySelectorAll('a[href]').forEach(a => add(a.getAttribute('href'), (a.textContent||'').replace(/\s+/g,' ').trim()));
-    doc.querySelectorAll('form[action]').forEach(f => add(f.getAttribute('action'), 'Form submits to'));
+    doc.querySelectorAll('form[action]').forEach(f => add(f.getAttribute('action'), 'Form submits to',
+      {form:true, password:[...f.querySelectorAll('input')].some(i => (i.getAttribute('type') || '').toLowerCase() === 'password')}));
     htmlText += ' ' + (doc.body ? doc.body.textContent : '');
   }
   const plainUrls = new Set(links.map(l => l.href));
@@ -36,6 +37,10 @@ export function analyzeLink(l){
   if (/^data:/i.test(l.href)) flags.push(['high','Opens content embedded in the email itself, a trick for hiding fake sign-in pages']);
   let url = null;
   try { url = new URL(l.href.startsWith('//') ? 'https:' + l.href : l.href); } catch(e){}
+  // Real companies send you to their site to sign in. A form inside the email itself is a harvesting trick.
+  const dest = url && url.hostname ? url.hostname : 'an unknown address';
+  if (l.form) flags.push(l.password ? ['high',`A sign-in form built into the email. Whatever you type, including your password, goes to ${dest}`]
+    : ['medium',`A form built into the email sends whatever you type to ${dest}`]);
   if (url && /^https?:$/.test(url.protocol)){
     const h = url.hostname.toLowerCase();
     if (/^\d{1,3}(\.\d{1,3}){3}$/.test(h) || h.startsWith('[')) flags.push(['high','Goes straight to an IP address instead of a named website']);

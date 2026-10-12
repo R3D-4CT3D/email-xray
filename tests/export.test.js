@@ -77,3 +77,8 @@ test('CSV export neutralizes spreadsheet formulas from attacker-controlled value
   expect(rows[2]).toBe("filename,'-2+3,'-2+3,Attachment");
   expect(rows[3]).toBe('domain,evil.example,evil[.]example,Link host');
 });
+
+test('a password form in the body maps to Phishing for Information', async () => {
+  const r = await scanFull('form-harvest.eml');
+  expect(r.attack.map(t => t.id)).toContain('T1598');
+});

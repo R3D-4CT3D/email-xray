@@ -16,6 +16,7 @@ export function mapAttack(r){
     add('T1566.002','Phishing: Spearphishing Link', `${badLinks.length} suspicious link${badLinks.length > 1 ? 's' : ''}.`);
     add('T1204.001','User Execution: Malicious Link','Depends on the recipient clicking.');
   }
+  if (r.links.some(l => l.form && l.password)) add('T1598','Phishing for Information','Collects a password through a form built into the email.');
   if (r.cues.some(c => /verify|sensitive/i.test(c.label)) && (badLinks.length || badAtts.length)) add('T1598.003','Phishing for Information: Spearphishing Link','Asks the recipient to verify account details, consistent with credential harvesting.');
   if (hit(/imitates|Name says|Pretends to be|fake address/i)) add('T1656','Impersonation','Poses as a trusted brand or sender.');
   if (r.auth.dmarc === 'fail' || hit(/fake address/i)) add('T1672','Email Spoofing','Sender identity is forged or fails DMARC alignment.');

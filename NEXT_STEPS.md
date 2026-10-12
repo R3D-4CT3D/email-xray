@@ -25,8 +25,8 @@ The current file was built for the claude.ai artifact runtime. Make it work anyw
 3. Build a fixture corpus: 10 real phish from your spam folder (scrub your own address), 10 legitimate emails (bank, Amazon, newsletters) to catch false positives. Never commit real people's personal data. The synthetic fixtures are in; the real ones are still to do.
 4. Track false positives and tune lookalike detection and scoring weights against the corpus. Leads found while writing tests:
    - [done] The "stuffs the brand into an unrelated domain" rule matched plain substrings (`purchase-orders.com` as Chase, `officedepot.com` as Microsoft, `pineapple` as Apple). It now needs the brand as its own token, or a lure word (verify, login, refund) next to it. On a 33 phish / 37 benign domain list: 29/33 and 23/37 flagged before, 33/33 and 0/37 after. Those lists live in `tests/domains.test.js`; re-check against the real corpus.
-   - An email with heavy pressure language but no links or attachments (business email compromise, gift card scams) caps at 20 points, "A few oddities". See `language-pressure.eml`.
-   - A `<form action>` in the body is extracted but not flagged by itself.
+   - An email with heavy pressure language but no links or attachments (business email compromise, gift card scams) caps at 20 points, "A few oddities". See `language-pressure.eml`. Both misses are `test.fails` cases in `tests/verdicts.test.js`.
+   - [done] A `<form>` in the body is now flagged: medium on its own, high with a password field, mapped to ATT&CK T1598. It still only scores 27 when the sender passes DMARC, so it shares the scoring question above.
    - A legitimate sender's own domains and IPs are listed as IOCs. Consider leaving them out when DMARC passes and nothing else fires.
 5. [done] GitHub Actions: `test.yml` runs tests and a build on every push and PR. `pages.yml` now tests, builds, and deploys `dist/`.
 

@@ -13,6 +13,7 @@ Every check has a fixture here, and `tests/` asserts what each one should produc
 | `links-tricks.eml` | IP links, the `@` trick, `javascript:` and `data:` links, text/target mismatch, decoy subdomain, punycode, shortener, free host, abused TLD, deep subdomains, form action |
 | `attachments-risky.eml` | Executable with a double extension, archive, harmless text file, RFC 2231 encoded filename |
 | `language-pressure.eml` | Pressure phrases with no links or attachments |
+| `form-harvest.eml` | Forms in the body: one with a password field, one without, on a sender with passing DMARC |
 | `msgreader-attach-sample.msg` | Outlook `.msg` with transport headers and an attachment |
 
 ## Rules

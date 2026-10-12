@@ -20,9 +20,18 @@ test.each([
   ['auth-failures.eml', 30, 59],
   ['language-pressure.eml', 10, 29],
   ['route-anomalies.eml', 10, 29],
+  ['form-harvest.eml', 10, 100],
   ['legit-newsletter.eml', 0, 9],
 ])('%s scores between %i and %i', (name, lo, hi) => {
   const s = scan(name).score;
   expect(s).toBeGreaterThanOrEqual(lo);
   expect(s).toBeLessThanOrEqual(hi);
+});
+
+// Known false negatives. test.fails passes while the miss exists; when scoring fixes one, it fails here: move it into the table above.
+test.fails.each([
+  ['form-harvest.eml', 30],      // password form in the body, but DMARC passes on its own domain: 27
+  ['language-pressure.eml', 30], // heavy pressure, no links or attachments (BEC style): 20
+])('KNOWN MISS: %s should score at least %i', (name, lo) => {
+  expect(scan(name).score).toBeGreaterThanOrEqual(lo);
 });

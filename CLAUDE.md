@@ -24,7 +24,7 @@ A client-side phishing email analyzer. Vanilla JS ES modules built with Vite (ro
 ## Testing
 - `npm test` runs Vitest (jsdom environment) over `tests/`. Fixtures are in `samples/`, described in `samples/README.md`.
 - Every check has a fixture and a test file. A new check needs both.
-- `tests/verdicts.test.js` pins the score band of every fixture. Scoring or lookalike changes must keep it green, or update it deliberately.
+- `tests/verdicts.test.js` pins the score band of every fixture, plus known false negatives as `test.fails`. Scoring or lookalike changes must keep it green, or update it deliberately.
 - `tests/domains.test.js` holds a phish list and a benign list for `lookalike`. Add every new false positive or miss there. A known but unfixed one goes in as `test.fails`, so the fix flips it.
 - `tests/page.test.js` automates the manual check: click "Try a sample phish", expect "Likely phishing" with the hop route, lookalike, and attachment findings.
 - CI: `.github/workflows/test.yml` on every push and PR; `pages.yml` tests, builds, and deploys `dist/` from `main`.
