@@ -39,6 +39,7 @@ npm install
 npm run dev      # dev server with hot reload
 npm test         # Vitest suite against the fixtures in samples/
 npm run build    # static site in dist/, which is what GitHub Pages serves
+npm run build:artifact  # one self-contained HTML file in dist-artifact/, for the claude.ai artifact
 ```
 
 Click **Try a sample phish**, or drag any file from `samples/` onto the page.

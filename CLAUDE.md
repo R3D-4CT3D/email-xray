@@ -19,6 +19,7 @@ A client-side phishing email analyzer. Vanilla JS ES modules built with Vite (ro
 - `src/ui/render.js` `render(r)`: builds the results UI. `src/ui/investigator.js` has the Investigator-only blocks.
 - `src/ui/runtime.js` `saveFile(name, data, btn)`: claude.ai save dialog when available, otherwise a Blob download.
 - `src/main.js` `loadFile(f)`: file picker and drag-and-drop entry point. `src/parse/msg.js` `msgToRaw` converts `.msg` to raw RFC 822 text before `analyze`.
+- `npm run build:artifact` (Vite `--mode artifact`) inlines everything into `dist-artifact/index.html` for the claude.ai artifact, which serves one page. License notices go in a trailing HTML comment there.
 - `src/parse/msgreader.js` must import `./buffer-shim.js` before msgreader, which expects Node's `Buffer` global.
 
 ## Testing
