@@ -12,9 +12,13 @@ export const BRANDS = [
  ['Citi',['citi.com','citibank.com']],['eBay',['ebay.com']],['Walmart',['walmart.com']],['Verizon',['verizon.com']],
  ['Xfinity',['xfinity.com','comcast.net']],['Okta',['okta.com']],['GitHub',['github.com','githubusercontent.com']],
  ['Steam',['steampowered.com','steamcommunity.com']],['Spotify',['spotify.com']],['Norton',['norton.com']],
- ['McAfee',['mcafee.com']],['Geek Squad',['bestbuy.com','geeksquad.com']]
+ ['McAfee',['mcafee.com']],['Geek Squad',['bestbuy.com','geeksquad.com']],['MetaMask',['metamask.io']]
 ];
 export const FUZZY_SKIP = new Set(['gmail','office','outlook','live','meta','apple','chase','steam','icloud','youtube']);
+// Brand names that are also everyday words. As a domain token they only count next to a lure word.
+export const COMMON_WORDS = new Set(['office','outlook','live','meta','apple','chase','steam','zoom']);
+// Words phishing domains pair with a brand name (paypal-verify, appleid-support, usps-redelivery).
+export const LURE_WORDS = ['secure','security','login','logon','signin','verify','verification','validate','confirm','account','support','helpdesk','help','update','billing','payment','invoice','refund','claim','reward','prize','gift','wallet','recover','unlock','suspend','locked','alert','notice','center','centre','online','auth','portal','access','service','customer','delivery','parcel','tracking','track','resolution'];
 export const FREEMAIL = new Set(['gmail.com','googlemail.com','outlook.com','hotmail.com','live.com','yahoo.com','aol.com','icloud.com','me.com','proton.me','protonmail.com','gmx.com','gmx.net','mail.com','yandex.com','yandex.ru','zoho.com','tutanota.com','mail.ru','qq.com','163.com']);
 export const SHORTENERS = new Set(['bit.ly','tinyurl.com','t.co','goo.gl','ow.ly','is.gd','buff.ly','rebrand.ly','cutt.ly','shorturl.at','rb.gy','t.ly','lnkd.in','tiny.cc','s.id','bl.ink','short.io','qrco.de']);
 export const BAD_TLDS = new Set(['top','xyz','click','link','zip','mov','icu','cyou','rest','country','gq','tk','ml','cf','ga','buzz','monster','sbs','cfd','quest','live','shop','support']);

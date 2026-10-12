@@ -1,5 +1,5 @@
 /* Registrable domains and brand impersonation detection. */
-import { BRANDS, FUZZY_SKIP, MULTI } from '../data.js';
+import { BRANDS, FUZZY_SKIP, MULTI, COMMON_WORDS, LURE_WORDS } from '../data.js';
 
 export function registrable(h){
   h = (h||'').toLowerCase().replace(/\.$/,'').replace(/^\[|\]$/g,'');
@@ -23,6 +23,15 @@ function lev(a,b){
 }
 export const isBrandDomain = (h, doms) => doms.some(d => h === d || h.endsWith('.' + d));
 export const knownBrand = h => !!h && BRANDS.some(([,d]) => isBrandDomain(h.toLowerCase(), d));
+// True when the text around a brand name reads like a lure ("verify", "-support", "id").
+const hasLure = rest => rest.split(/[-0-9]+/).some(p => p === 'id' || LURE_WORDS.some(w => p.includes(w)));
+// A brand name inside a longer label. "secure-paypal" and "paypalverify" count; "pineapple" and "officedepot" don't.
+function stuffed(lab, bl){
+  const tokens = lab.split(/[-0-9]+/);
+  const rest = lab.replace(bl, '-');
+  if (tokens.includes(bl)) return (bl.length >= 5 && !COMMON_WORDS.has(bl)) || hasLure(rest);
+  return bl.length >= 5 && lab.includes(bl) && hasLure(rest);
+}
 export function lookalike(host){
   if (!host) return null;
   host = host.toLowerCase().replace(/\.$/,'');
@@ -36,8 +45,8 @@ export function lookalike(host){
       if (lab === bl && bl.length >= 5) return {brand, sev:'medium', why:`uses the name "${bl}" with a different ending (${reg}) than ${brand}'s real site, ${d}`};
       if (lab !== bl && sk === skel(bl)) return {brand, sev:'high', why:`"${lab}" swaps in lookalike characters to pass as "${bl}"`};
       if (bl.length >= 5 && !FUZZY_SKIP.has(bl) && lab !== bl && lev(lab, bl) <= (bl.length >= 8 ? 2 : 1)) return {brand, sev:'high', why:`"${lab}" is a near-misspelling of "${bl}"`};
-      if (bl.length >= 5 && lab !== bl && lab.includes(bl)) return {brand, sev:'high', why:`stuffs "${bl}" into an unrelated domain (${reg})`};
-      if (bl.length >= 5 && sk.includes(skel(bl))) return {brand, sev:'high', why:`hides a disguised "${bl}" inside "${lab}" using lookalike characters`};
+      if (lab !== bl && stuffed(lab, bl)) return {brand, sev:'high', why:`stuffs "${bl}" into an unrelated domain (${reg})`};
+      if (bl.length >= 5 && !lab.includes(bl) && sk.includes(skel(bl))) return {brand, sev:'high', why:`hides a disguised "${bl}" inside "${lab}" using lookalike characters`};
       if (bl.length >= 4 && subLabels.includes(bl)) return {brand, sev:'high', why:`puts "${bl}" in front as a decoy. The real owner is ${reg}`};
     }
   }
