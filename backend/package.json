@@ -1,0 +1,15 @@
+{
+  "name": "email-xray-api",
+  "private": true,
+  "type": "module",
+  "description": "Network lookups for Email X-Ray, as a Cloudflare Worker",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.7",
+    "wrangler": "^4.149.0"
+  }
+}
