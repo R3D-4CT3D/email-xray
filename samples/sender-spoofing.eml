@@ -1,0 +1,14 @@
+Received: from relay.notify-center.example (relay.notify-center.example [203.0.113.80])
+        by mx.example.com with ESMTP id r1
+        for <you@example.com>; Wed, 7 Oct 2026 10:00:05 +0000
+Return-Path: <mailer@bulk-sender.example>
+From: "=?UTF-8?Q?security=40paypal=2Ecom?=" <alerts@notify-center.example>
+Reply-To: "Account Team" <account.team.help@outlook.com>
+To: you@example.com
+Subject: Security alert
+Date: Wed, 7 Oct 2026 10:00:00 +0000
+Message-ID: <x99@mta.unrelated-host.example>
+X-Mailer: PHPMailer 6.5.0
+Content-Type: text/plain; charset=UTF-8
+
+A new sign-in was detected. Reply to this message if it was not you.

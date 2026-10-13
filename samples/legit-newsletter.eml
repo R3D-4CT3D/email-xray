@@ -1,0 +1,36 @@
+Delivered-To: reader@example.com
+Received: by 2002:a05:6a10:1c2::5 with SMTP id z9csp1100;
+        Mon, 5 Oct 2026 09:15:04 -0700 (PDT)
+Return-Path: <bounce@news.examplestore.com>
+Received: from mail.news.examplestore.com (mail.news.examplestore.com [198.51.100.24])
+        by mx.example.com with ESMTPS id q7si4410
+        for <reader@example.com>; Mon, 5 Oct 2026 09:15:03 -0700 (PDT)
+Authentication-Results: mx.example.com;
+       dkim=pass header.i=@examplestore.com header.s=s1 header.b=AbCd;
+       spf=pass (example.com: domain of bounce@news.examplestore.com designates 198.51.100.24 as permitted sender) smtp.mailfrom=bounce@news.examplestore.com;
+       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=examplestore.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=examplestore.com; s=s1; h=from:to:subject:date; bh=AAAA; b=BBBB
+From: Example Store <news@examplestore.com>
+To: reader@example.com
+Subject: Your October picks are here
+Date: Mon, 5 Oct 2026 16:15:00 +0000
+Message-ID: <a1b2c3@news.examplestore.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="b1"
+
+--b1
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+
+Hi Sam,
+
+Here are this month=92s picks. Browse them at https://www.examplestore.com/october
+
+Thanks for reading.
+--b1
+Content-Type: text/html; charset=UTF-8
+
+<html><body><p>Hi Sam,</p><p>Here are this month's picks.</p>
+<p><a href="https://www.examplestore.com/october">www.examplestore.com/october</a></p>
+<p><a href="https://www.examplestore.com/unsubscribe">Unsubscribe</a></p></body></html>
+--b1--

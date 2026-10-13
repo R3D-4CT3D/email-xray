@@ -1,0 +1,25 @@
+Received: from mail.links.example (mail.links.example [203.0.113.10])
+        by mx.example.com with ESMTPS id l1
+        for <you@example.com>; Sat, 10 Oct 2026 09:00:00 +0000
+From: Links Test <test@links.example>
+To: you@example.com
+Subject: Several links
+Date: Sat, 10 Oct 2026 09:00:00 +0000
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: base64
+
+PGh0bWw+PGJvZHk+CjxhIGhyZWY9Imh0dHA6Ly8yMDMuMC4xMTMuNS9sb2dpbiI+U2lnbiBpbjwv
+YT4KPGEgaHJlZj0iaHR0cHM6Ly93d3cuZXhhbXBsZWJhbmsuY29tQGV2aWwuZXhhbXBsZS5uZXQv
+Ij5CYW5rPC9hPgo8YSBocmVmPSJqYXZhc2NyaXB0OmFsZXJ0KDEpIj5PcGVuPC9hPgo8YSBocmVm
+PSJkYXRhOnRleHQvaHRtbDtiYXNlNjQsUEdneFBraHBQQzlvTVQ0PSI+VmlldzwvYT4KPGEgaHJl
+Zj0iaHR0cHM6Ly94bi0tZXhtcGxlLWN1YS5jb20vIj5leGFtcGxlPC9hPgo8YSBocmVmPSJodHRw
+czovL2JpdC5seS9hYmMxMjMiPlNob3J0PC9hPgo8YSBocmVmPSJodHRwczovL2ludm9pY2Utdmll
+d2VyLndlYi5hcHAvIj5JbnZvaWNlPC9hPgo8YSBocmVmPSJodHRwczovL3BvcnRhbC5yZXdhcmRz
+LWNsYWltLnRvcC8iPkNsYWltPC9hPgo8YSBocmVmPSJodHRwczovL2V2aWwuZXhhbXBsZS5uZXQv
+cGF0aCI+aHR0cHM6Ly93d3cuZXhhbXBsZWJhbmsuY29tL2xvZ2luPC9hPgo8YSBocmVmPSJodHRw
+czovL2EuYi5jLmQuZXhhbXBsZS5vcmcvIj5EZWVwPC9hPgo8YSBocmVmPSJodHRwczovL3d3dy5w
+YXlwYWwuY29tLnNlY3VyZS1sb2dpbi5leGFtcGxlLyI+UGF5UGFsPC9hPgo8Zm9ybSBhY3Rpb249
+Imh0dHBzOi8vY29sbGVjdC5leGFtcGxlLm5ldC9zdWJtaXQiPjxpbnB1dCBuYW1lPSJwIj48L2Zv
+cm0+CjxhIGhyZWY9Im1haWx0bzpoZWxwQGxpbmtzLmV4YW1wbGUiPk1haWwgdXM8L2E+CjwvYm9k
+eT48L2h0bWw+Cg==

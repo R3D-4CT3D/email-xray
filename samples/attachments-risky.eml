@@ -1,0 +1,38 @@
+Received: from mail.files.example (mail.files.example [203.0.113.20])
+        by mx.example.com with ESMTPS id a1
+        for <you@example.com>; Sun, 11 Oct 2026 09:00:00 +0000
+From: Files <files@files.example>
+To: you@example.com
+Subject: Documents
+Date: Sun, 11 Oct 2026 09:00:00 +0000
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="m1"
+
+--m1
+Content-Type: text/plain; charset=UTF-8
+
+See the attached files.
+--m1
+Content-Type: application/octet-stream; name="Invoice_2026.pdf.exe"
+Content-Disposition: attachment; filename="Invoice_2026.pdf.exe"
+Content-Transfer-Encoding: base64
+
+TVqQAAMAAAAEAAAA
+--m1
+Content-Type: application/zip; name="records.zip"
+Content-Disposition: attachment; filename="records.zip"
+Content-Transfer-Encoding: base64
+
+UEsDBAoAAAAAAA==
+--m1
+Content-Type: text/plain; name="notes.txt"
+Content-Disposition: attachment; filename="notes.txt"
+
+plain notes
+--m1
+Content-Type: application/octet-stream; name="=?UTF-8?B?c2NhbiDwn5OELmh0bWw=?="
+Content-Disposition: attachment; filename*=UTF-8''scan.html
+Content-Transfer-Encoding: base64
+
+PGh0bWw+PC9odG1sPg==
+--m1--

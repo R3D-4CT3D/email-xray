@@ -1,0 +1,20 @@
+Received: from mx2.example.com (mx2.example.com [198.51.100.2])
+        by mx.example.com with ESMTPS id h4
+        for <you@example.com>; Fri, 9 Oct 2026 09:41:00 +0000
+Received: from relay.example.net (relay.example.net [198.51.100.3])
+        by mx2.example.com with ESMTP id h3
+        for <you@example.com>; Fri, 9 Oct 2026 09:40:00 +0000
+Received: from mail.trusted-sender.example (host-7.dialup.isp.example [203.0.113.7])
+        by relay.example.net with SMTP id h2
+        for <you@example.com>; Fri, 9 Oct 2026 10:00:00 +0000
+Received: from [192.168.1.20] (unknown [192.168.1.20])
+        by mail.trusted-sender.example with SMTP id h1
+        for <you@example.com>; Fri, 9 Oct 2026 08:30:00 +0000
+X-Originating-IP: [203.0.113.99]
+From: Pat <pat@trusted-sender.example>
+To: you@example.com
+Subject: Quick question
+Date: Fri, 9 Oct 2026 08:29:00 +0000
+Content-Type: text/plain; charset=UTF-8
+
+Do you have a minute today?
