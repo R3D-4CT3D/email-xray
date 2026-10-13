@@ -1,6 +1,6 @@
 /* Link checks: extraction from text and HTML, then per-link red flags. Links are never fetched. */
 import { SHORTENERS, FREE_HOSTS, BAD_TLDS, SEV_ORDER } from '../data.js';
-import { lookalike, sameOrg, registrable } from './domains.js';
+import { lookalike, sameOrg, registrable, knownBrand } from './domains.js';
 
 function hostFromText(t){
   if (!t) return null;
@@ -59,9 +59,22 @@ export function analyzeLink(l){
   flags.sort((a,b) => SEV_ORDER[a[0]] - SEV_ORDER[b[0]]);
   return {...l, host: url ? url.hostname : null, flags};
 }
-export function checkLinks(texts, htmls){
+// Button text that asks for credentials or opens a "document". Real senders point these at their own site.
+const CTA = /^\W*(log ?in|sign ?in|verify|validate|confirm (your )?(e-?mail|account|identity|password)|re-?activate|unlock|restore (access|account)|keep (my |your |the )?(password|mailbox|account|e-?mail|access)|(update|change|reset) (my |your )?(password|account|payment|details)|upgrade (my |your )?(mailbox|storage|account)|release (the )?(messages|e-?mails|mails)|(review|view|access|open|download) (the |your )?(document|file|pdf|invoice|contract|message|shared file)s?)\b.{0,40}$/i;
+function ctaFlag(l, senderDomain){
+  if (!senderDomain || !l.host || !CTA.test(l.shown || '')) return null;
+  const h = l.host.toLowerCase();
+  if (sameOrg(h, senderDomain) || knownBrand(h)) return null;
+  return ['medium', `"${l.shown.trim()}" leads to ${h}, which isn't the sender's site`];
+}
+export function checkLinks(texts, htmls, senderDomain){
   const {links, htmlText} = extractLinks(texts, htmls);
-  const analyzed = links.map(analyzeLink).sort((a,b) => (a.flags[0] ? SEV_ORDER[a.flags[0][0]] : 9) - (b.flags[0] ? SEV_ORDER[b.flags[0][0]] : 9));
+  const analyzed = links.map(l => {
+    const a = analyzeLink(l);
+    const cta = ctaFlag(a, senderDomain);
+    if (cta && !a.flags.some(f => f[0] === 'high')){ a.flags.push(cta); a.flags.sort((x,y) => SEV_ORDER[x[0]] - SEV_ORDER[y[0]]); }
+    return a;
+  }).sort((a,b) => (a.flags[0] ? SEV_ORDER[a.flags[0][0]] : 9) - (b.flags[0] ? SEV_ORDER[b.flags[0][0]] : 9));
   const findings = analyzed.flatMap(l => l.flags.map(([sev, t]) => ({area:'links', sev, title:t, hidden:true})));
   return {findings, links: analyzed, htmlText};
 }

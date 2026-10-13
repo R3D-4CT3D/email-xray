@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "build:artifact": "vite build --mode artifact"
+    "build:artifact": "vite build --mode artifact",
+    "eval": "tools/eval/both.sh"
   },
   "devDependencies": {
     "jsdom": "^26.1.0",

@@ -1,0 +1,22 @@
+Return-Path: <dev-bounces@lists.example.org>
+Received: from lists.example.org (lists.example.org [198.51.100.40])
+        by mx.example.com with ESMTP id m1
+        for <reader@example.com>; Tue, 13 Oct 2026 10:00:05 +0000
+Received: from mail.university.example (mail.university.example [198.51.100.41])
+        by lists.example.org with ESMTP id m0
+        for <dev@lists.example.org>; Tue, 13 Oct 2026 10:00:01 +0000
+From: Alice Chen <alice@university.example>
+Reply-To: dev@lists.example.org
+To: dev@lists.example.org
+Subject: Re: [dev] Release notes for 2.4
+Date: Tue, 13 Oct 2026 10:00:00 +0000
+List-Id: Developer discussion <dev.lists.example.org>
+List-Post: <mailto:dev@lists.example.org>
+List-Unsubscribe: <http://lists.example.org/mailman/options/dev>
+Precedence: list
+Content-Type: text/plain; charset=UTF-8
+
+The draft is at http://wiki.university.example/release-2.4 and the old one
+at http://wiki.university.example/release-2.3 if you want to compare.
+
+Archive: http://lists.example.org/pipermail/dev/

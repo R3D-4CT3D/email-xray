@@ -22,12 +22,27 @@ The current file was built for the claude.ai artifact runtime. Make it work anyw
 
 1. [done] Move to a Vite project: `src/parse/` (MIME, headers, Received, .msg), `src/checks/` (sender, auth, route, links, attachments, language, lookalike domains), `src/export/` (IOC, ATT&CK, STIX, report, hashes), `src/ui/`. The vendored msgreader bundle is gone; it is an npm dependency loaded with `import()`.
 2. [done] Add Vitest. One test per check using `.eml` fixtures in `samples/`, plus a `.msg` fixture and a page smoke test.
-3. Build a fixture corpus: 10 real phish from your spam folder (scrub your own address), 10 legitimate emails (bank, Amazon, newsletters) to catch false positives. Never commit real people's personal data. The synthetic fixtures are in; the real ones are still to do.
-4. Track false positives and tune lookalike detection and scoring weights against the corpus. Leads found while writing tests:
-   - [done] The "stuffs the brand into an unrelated domain" rule matched plain substrings (`purchase-orders.com` as Chase, `officedepot.com` as Microsoft, `pineapple` as Apple). It now needs the brand as its own token, or a lure word (verify, login, refund) next to it. On a 33 phish / 37 benign domain list: 29/33 and 23/37 flagged before, 33/33 and 0/37 after. Those lists live in `tests/domains.test.js`; re-check against the real corpus.
-   - An email with heavy pressure language but no links or attachments (business email compromise, gift card scams) caps at 20 points, "A few oddities". See `language-pressure.eml`. Both misses are `test.fails` cases in `tests/verdicts.test.js`.
-   - [done] A `<form>` in the body is now flagged: medium on its own, high with a password field, mapped to ATT&CK T1598. It still only scores 27 when the sender passes DMARC, so it shares the scoring question above.
-   - A legitimate sender's own domains and IPs are listed as IOCs. Consider leaving them out when DMARC passes and nothing else fires.
+3. [partly done] Fixture corpus. `tools/eval/` runs the analyzer over two public corpora kept outside git: 883 real phishing emails from the Nazario corpus (2024 and 2025, full headers) and 4,150 legitimate emails from the SpamAssassin corpus (2002). Still missing: legitimate mail with modern headers, which the user's own inbox can supply.
+4. [in progress] Tune against the corpus. Caught means Suspicious or worse.
+
+   | Step | Phishing caught | Legitimate flagged |
+   |---|---|---|
+   | Before tuning | 14.4% | 25.4% |
+   | Each distinct finding counts once; weak findings capped at 9 points | 9.9% | 6.8% |
+   | Recipient's own domain or organization in the subject or sender name | 27.5% | 6.8% |
+   | Invisible characters inside words in the subject or sender name | 27.5% | 6.8% |
+   | Mailbox credential phrases (password expiring, mailbox full, shared file) | 29.9% | 6.8% |
+   | Sign-in or document buttons that lead to a site other than the sender's | 34.2% | 6.8% |
+   | Mailing lists' Reply-To no longer flagged | 33.9% | 3.4% |
+
+   Earlier fixes from the synthetic fixtures:
+   - [done] The "stuffs the brand into an unrelated domain" rule matched plain substrings (`purchase-orders.com` as Chase, `officedepot.com` as Microsoft, `pineapple` as Apple). It now needs the brand as its own token, or a lure word (verify, login, refund) next to it.
+   - [done] A `<form>` in the body is flagged: medium on its own, high with a password field, mapped to ATT&CK T1598.
+
+   Still open:
+   - Two thirds of real phishing still scores under 30. Run `node tools/eval/eval.js --misses 50` on the Nazario files to see the next patterns.
+   - An email with heavy pressure language but no links or attachments (business email compromise, gift card scams) caps at 20 points. `test.fails` in `tests/verdicts.test.js`.
+   - A legitimate sender's own domains and IPs are listed as IOCs.
 5. [done] GitHub Actions: `test.yml` runs tests and a build on every push and PR. `pages.yml` now tests, builds, and deploys `dist/`.
 
 Fixed along the way: RFC 2231 attachment names (`filename*=UTF-8''scan.html` showed as `UTF-8''scan.html`), and the Markdown report leaking live IPs, DKIM domains, and the raw Authentication-Results header without defanging.

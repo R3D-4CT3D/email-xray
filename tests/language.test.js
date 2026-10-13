@@ -19,3 +19,11 @@ test('the subject line counts', () => {
 test('ordinary wording has no cues', () => {
   expect(checkLanguage('Here are this month’s picks. Thanks for reading.')).toEqual({cues:[], points:0});
 });
+
+test('credential phishing about the recipient\'s mailbox is recognized', () => {
+  expect(scan('mailbox-impersonation.eml').cues.map(c => c.label)).toEqual(expect.arrayContaining([
+    'Says your password is expiring', 'Says your mailbox is full', 'Says your messages are being held',
+  ]));
+  expect(checkLanguage('Alice has shared a document with you. You have a new voicemail.').cues.map(c => c.label))
+    .toEqual(['Says someone shared a file with you', 'Mentions a voicemail']);
+});
