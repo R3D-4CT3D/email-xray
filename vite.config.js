@@ -37,6 +37,8 @@ export default defineConfig(({ mode }) => ({
   // Relative asset paths so the build works under any GitHub Pages subpath.
   base: './',
   build: { outDir: mode === 'artifact' ? '../dist-artifact' : '../dist', emptyOutDir: true },
+  // ASCII-only output keeps characters like U+FFFD (used by iconv-lite) as escapes, which the artifact publisher requires.
+  esbuild: mode === 'artifact' ? { charset: 'ascii' } : undefined,
   plugins: mode === 'artifact' ? [viteSingleFile(), thirdPartyLicenses({ inline: true })] : [thirdPartyLicenses()],
   test: {
     root: '.',
