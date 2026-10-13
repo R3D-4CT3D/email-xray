@@ -32,7 +32,7 @@ The current file was built for the claude.ai artifact runtime. Make it work anyw
 
 Fixed along the way: RFC 2231 attachment names (`filename*=UTF-8''scan.html` showed as `UTF-8''scan.html`), and the Markdown report leaking live IPs, DKIM domains, and the raw Authentication-Results header without defanging.
 
-## Phase 3: Backend for network lookups (1 to 2 weekends)
+## Phase 3: Backend for network lookups (1 to 2 weekends) [in progress]
 
 A small server that holds API keys and does lookups the browser shouldn't. Good fits: a Cloudflare Worker (free tier) or a Node/Express app.
 
@@ -52,10 +52,12 @@ Rules for the backend:
 - Rate limit per IP.
 - The browser never contacts phishing infrastructure directly.
 
+Done so far (keyless, in `backend/`): `GET /domain/:d/age` and `GET /ip/:ip` through RDAP, `GET /url/expand` limited to known shortener hosts, with validation, caching, a per-IP rate limit, and logs without looked-up values. Deploys from `main` through `deploy-api.yml` once the Cloudflare secrets are set. Still to do: reputation endpoints (need API keys), `POST /dkim/verify`, and the country for ARIN addresses (it sits in the owner's postal address).
+
 Then in the frontend:
-1. Add a "Run network checks" toggle in Investigator mode, off by default, with a note explaining what gets sent.
+1. [done] A "Run network checks" button in Investigator mode. Nothing is sent until it is clicked, and the block lists every value that will be sent.
 2. Draw the route on a map with Leaflet and OpenStreetMap tiles. This is the big "wow" moment.
-3. Add domain age to the sender and link findings. Under 30 days is high risk.
+3. [done] Domain age in the sender and link findings. Under 30 days is high risk. Shortened links are followed to their destination, which is then checked like any other link.
 4. Show reputation hits next to each IOC.
 
 ## Phase 4: AI analysis through the backend (1 evening)

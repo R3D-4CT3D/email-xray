@@ -19,3 +19,20 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      # Bundles the Worker without uploading it, so import or config errors fail here instead of at deploy.
+      - run: npx wrangler deploy --dry-run --outdir dist

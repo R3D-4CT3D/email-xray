@@ -29,6 +29,7 @@ Email X-Ray takes the raw source of an email (pasted headers, a `.eml` file, or 
 - Raw hop table and raw authentication headers with DKIM selector locations
 - AI second read for pretext and social engineering (claude.ai artifact runtime only)
 - Downloadable Markdown case report
+- Network checks (optional, run on request): domain age with brand-new domains flagged, origin IP owner, and where shortened links really go. Only those values are sent, to the API in `backend/`, which never opens a link
 
 ## Run it locally
 
@@ -59,6 +60,7 @@ email-xray/
     checks/           sender, auth, route, links, attachments, language, lookalike domains
     export/           IOCs and defanging, ATT&CK, STIX 2.1, Markdown report, hashes
     ui/               rendering, Investigator blocks, view mode, host integration
+  backend/            Cloudflare Worker for network lookups (see backend/README.md)
   tests/              one Vitest file per check, plus exports, .msg, and a page smoke test
   samples/            fixture emails (see samples/README.md)
   docs/               screenshots and write-ups
@@ -81,7 +83,7 @@ The `.msg` parser (`@kenjiuno/msgreader`) is split into its own chunk and only d
 ## Limits
 
 - Analysis is static. Links are never visited and attachments are never opened.
-- Shortened links can't be expanded and IPs can't be geolocated without a backend (planned).
+- Without the API in `backend/`, shortened links aren't expanded and domain age isn't checked. Reputation lookups and a route map are still planned.
 - Authentication results are read from the receiving server's stamp, not re-verified (planned).
 - A clean result is not a guarantee.
 

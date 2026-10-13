@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "email-xray-api",
+  "main": "src/index.js",
+  // Newest date the bundled runtime (workerd 1.20261006) supports.
+  "compatibility_date": "2026-10-06",
+  "vars": {
+    // Pages site plus the Vite dev server. CORS only governs browsers; the rate limit covers everyone else.
+    "ALLOWED_ORIGINS": "https://r3d-4ct3d.github.io,http://localhost:5173"
+  },
+  "ratelimits": [
+    { "name": "RATE_LIMITER", "namespace_id": "4801", "simple": { "limit": 60, "period": 60 } }
+  ],
+  "observability": {
+    "enabled": true,
+    "logs": { "enabled": true, "head_sampling_rate": 1 },
+    "traces": { "enabled": true, "head_sampling_rate": 0.05 }
+  }
+}
