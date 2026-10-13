@@ -14,6 +14,8 @@ Every check has a fixture here, and `tests/` asserts what each one should produc
 | `attachments-risky.eml` | Executable with a double extension, archive, harmless text file, RFC 2231 encoded filename |
 | `language-pressure.eml` | Pressure phrases with no links or attachments |
 | `form-harvest.eml` | Forms in the body: one with a password field, one without, on a sender with passing DMARC |
+| `mailbox-impersonation.eml` | "Your mailbox is full" from outside: the recipient's own domain in the subject, hidden characters, a sign-in button to an unrelated site |
+| `mailing-list.eml` | False-positive guard: a list post with Reply-To set to the list, plain http links, and a list bounce address |
 | `msgreader-attach-sample.msg` | Outlook `.msg` with transport headers and an attachment |
 
 ## Rules

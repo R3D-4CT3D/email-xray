@@ -20,7 +20,7 @@ export function analyze(raw){
   const {from, fromLook} = sender;
   const auth = checkAuth(headers, fromLook);
   const route = checkRoute(headers);
-  const links = checkLinks(acc.text, acc.html);
+  const links = checkLinks(acc.text, acc.html, from && from.domain);
   const atts = checkAttachments(acc.attachments);
   const F = [...sender.findings, ...auth.findings, ...route.findings, ...links.findings, ...atts.findings];
 
@@ -40,9 +40,15 @@ export function analyze(raw){
   };
 }
 
-// Findings by severity, plus capped pressure-language points, minus 10 when DMARC passes for a non-lookalike sender.
+// Each distinct finding counts once (nine http links are one signal, not nine), and weak findings
+// together add at most LOW_CAP, so on their own they never move the verdict past "No major red flags". Plus capped
+// pressure-language points, minus 10 when DMARC passes for a non-lookalike sender.
+const LOW_CAP = 9;
 export function scoreOf(F, {cuePoints, dmarcCredit}){
-  const s = F.reduce((t,f) => t + SEV_PTS[f.sev], 0) + cuePoints - (dmarcCredit ? 10 : 0);
+  const distinct = new Map(F.map(f => [f.sev + '|' + f.title, f.sev]));
+  let low = 0, s = 0;
+  for (const sev of distinct.values()) if (sev === 'low') low += SEV_PTS.low; else s += SEV_PTS[sev];
+  s += Math.min(low, LOW_CAP) + cuePoints - (dmarcCredit ? 10 : 0);
   return Math.max(0, Math.min(100, s));
 }
 

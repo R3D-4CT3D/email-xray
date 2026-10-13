@@ -50,12 +50,13 @@ test('young domains become high findings, and a shortened link is followed to it
   expect(buildIOCs(r).map(i => i.value)).toContain('https://secure-paypal-login.example/verify');
 });
 
-test('a young domain lifts a borderline email over the line', async () => {
+test('a young domain adds a high finding wherever it appears', async () => {
   const r = scan('form-harvest.eml');
-  expect(r.score).toBe(27);
+  const before = r.score;
   const {impl} = fakeApi({'/domain/it-helpdesk.example/age': {domain:'it-helpdesk.example', found:true, ageDays:5}});
   applyNetwork(r, await runLookups(networkTargets(r), impl));
-  expect(r.score).toBeGreaterThanOrEqual(30);
+  // it-helpdesk.example sends the email and hosts one of its forms: one sender finding, one link finding.
+  expect(r.score).toBe(before + 50);
 });
 
 test('API errors are reported per lookup and change nothing', async () => {

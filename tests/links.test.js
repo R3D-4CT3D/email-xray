@@ -42,3 +42,12 @@ test('forms in the body are flagged, and a password field makes it high risk', (
   const survey = r.links.find(l => l.href === 'https://survey.it-helpdesk.example/rate');
   expect(survey.flags).toEqual([['medium', 'A form built into the email sends whatever you type to survey.it-helpdesk.example']]);
 });
+
+test('a sign-in button to a site that isn\'t the sender\'s is flagged', () => {
+  const l = scan('mailbox-impersonation.eml').links.find(x => x.host === 'storage-check.example');
+  expect(l.flags).toEqual([['medium', '"Keep my mailbox" leads to storage-check.example, which isn\'t the sender\'s site']]);
+});
+
+test('ordinary link text and the sender\'s own buttons are not flagged', () => {
+  for (const f of ['legit-newsletter.eml', 'mailing-list.eml']) expect(scan(f).links.flatMap(l => l.flags).filter(x => /isn't the sender's site/.test(x[1]))).toEqual([]);
+});

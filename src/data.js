@@ -39,7 +39,14 @@ export const CUES = [
  [/\b(you('ve| have) won|winner|claim your|unclaimed|refund of)\b/i,'Promise of money or a prize'],
  [/\bdear (customer|user|client|member|valued|account holder|sir)/i,'Generic greeting instead of your name'],
  [/\bclick (here|below|the (link|button))\b/i,'Pushes you to click'],
- [/\b(invoice|payment|receipt|order)\s+(attached|enclosed|overdue|pending|failed|declined)\b/i,'Unexpected billing notice']
+ [/\b(invoice|payment|receipt|order)\s+(attached|enclosed|overdue|pending|failed|declined)\b/i,'Unexpected billing notice'],
+ // Credential phishing aimed at the recipient's own mailbox (the most common kind in the Nazario corpus).
+ [/\bpassword\b.{0,40}\b(expir\w*|deactivat\w*)|\bexpir\w*\b.{0,40}\bpassword\b/i,'Says your password is expiring'],
+ [/\b(mailbox|inbox|e-?mail storage|mail storage|quota)\b.{0,40}\b(full|exceeded|limit|almost|over)\b|\b(exceeded|reached)\b.{0,30}\b(quota|storage|mailbox)\b/i,'Says your mailbox is full'],
+ [/\b(shared|sent) (a |an |the |some )?(file|document|folder|pdf|contract|invoice)s? with you\b/i,'Says someone shared a file with you'],
+ [/\b(pending|undelivered|held|blocked|incoming) (e-?mails|messages|mails)\b|\bmessages? (are |were |is |has been )?(on hold|held|blocked|quarantined)\b/i,'Says your messages are being held'],
+ [/\b(voice ?mail|voice message)\b/i,'Mentions a voicemail'],
+ [/\b(e-?mail|webmail|mailbox) account\b.{0,60}\b(deactivat\w*|suspend\w*|terminat\w*|clos(e|ed|ing)|disabl\w*|verif\w*|upgrad\w*|validat\w*)/i,'Threatens your email account']
 ];
 export const SEV_PTS = {high:25, medium:12, low:5, info:0};
 export const SEV_LABEL = {high:'High risk', medium:'Worth a look', low:'Minor', info:'FYI'};

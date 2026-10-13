@@ -1,0 +1,20 @@
+Delivered-To: staff@northwind.example
+Received: from mail.quota-alerts.example (mail.quota-alerts.example [203.0.113.60])
+        by mx.northwind.example with ESMTPS id q1
+        for <staff@northwind.example>; Mon, 12 Oct 2026 08:00:00 +0000
+Authentication-Results: mx.northwind.example;
+       spf=pass smtp.mailfrom=alerts@quota-alerts.example;
+       dkim=pass header.d=quota-alerts.example;
+       dmarc=pass header.from=quota-alerts.example
+From: "Northwind IT Helpdesk" <alerts@quota-alerts.example>
+To: staff@northwind.example
+Subject: =?UTF-8?Q?(northwind.example)_Y=E2=80=8Cour_mail=E2=80=8Cbox_is_almost_full?=
+Date: Mon, 12 Oct 2026 08:00:00 +0000
+MIME-Version: 1.0
+Content-Type: text/html; charset=UTF-8
+
+<html><body>
+<p>Your mailbox storage has exceeded its quota and incoming messages are on hold.</p>
+<p>Your password will expire today unless you confirm your account.</p>
+<p><a href="https://storage-check.example/owa/login">Keep my mailbox</a></p>
+</body></html>
