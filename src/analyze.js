@@ -27,18 +27,23 @@ export function analyze(raw){
   const allText = (acc.text.join('\n') + '\n' + links.htmlText + '\n' + decodeWords(hOne(headers,'subject'))).replace(/\s+/g,' ');
   const language = checkLanguage(allText);
 
-  let score = F.reduce((s,f) => s + SEV_PTS[f.sev], 0) + language.points;
-  if (auth.auth.dmarc === 'pass' && !fromLook) score -= 10;
-  score = Math.max(0, Math.min(100, score));
+  const scoreInputs = {cuePoints: language.points, dmarcCredit: auth.auth.dmarc === 'pass' && !fromLook};
+  const score = scoreOf(F, scoreInputs);
 
   return {
-    headers, F, from, replyTo: sender.replyTo, retPath: sender.retPath, auth: auth.auth,
+    headers, F, scoreInputs, fromLook, from, replyTo: sender.replyTo, retPath: sender.retPath, auth: auth.auth,
     hops: route.hops, originIdx: route.originIdx, links: links.links, atts: atts.atts, cues: language.cues, score, xoip: route.xoip,
     arRaw: auth.arRaw, rspfRaw: hOne(headers,'received-spf'),
     dkimSigs: hAll(headers,'dkim-signature').map(v => ({d:(v.match(/\bd=([^;\s]+)/)||[])[1]||'?', s:(v.match(/\bs=([^;\s]+)/)||[])[1]||'?'})),
     subject: decodeWords(hOne(headers,'subject')), to: decodeWords(hOne(headers,'to')), date: hOne(headers,'date'),
     bodyText: (acc.text.join('\n\n').trim() || links.htmlText.trim()).slice(0, 8000)
   };
+}
+
+// Findings by severity, plus capped pressure-language points, minus 10 when DMARC passes for a non-lookalike sender.
+export function scoreOf(F, {cuePoints, dmarcCredit}){
+  const s = F.reduce((t,f) => t + SEV_PTS[f.sev], 0) + cuePoints - (dmarcCredit ? 10 : 0);
+  return Math.max(0, Math.min(100, s));
 }
 
 export function verdictFor(s){

@@ -6,7 +6,7 @@ A client-side phishing email analyzer. Vanilla JS ES modules built with Vite (ro
 ## Conventions
 - No em dashes in any user-facing text or docs.
 - Plain-English explanations in Standard mode. Analyst terms belong in Investigator mode.
-- The browser must never fetch links or open attachments from an analyzed email.
+- The browser must never fetch links or open attachments from an analyzed email. Network lookups go through `backend/` only when the analyst runs them, and the backend only requests shortener hosts and RDAP.
 - Indicators are always defanged in exports and reports.
 - Every new check needs a test fixture in `samples/` and a test in `tests/`.
 
@@ -20,6 +20,8 @@ A client-side phishing email analyzer. Vanilla JS ES modules built with Vite (ro
 - `src/ui/runtime.js` `saveFile(name, data, btn)`: claude.ai save dialog when available, otherwise a Blob download.
 - `src/main.js` `loadFile(f)`: file picker and drag-and-drop entry point. `src/parse/msg.js` `msgToRaw` converts `.msg` to raw RFC 822 text before `analyze`.
 - `npm run build:artifact` (Vite `--mode artifact`) inlines everything into `dist-artifact/index.html` for the claude.ai artifact, which serves one page. License notices go in a trailing HTML comment there.
+- `src/network.js`: `networkTargets(r)` (what would be sent), `runLookups`, `applyNetwork(r, net)` (adds findings and expanded links, then re-scores with `scoreOf`). API URL comes from `VITE_API_URL` at build time.
+- `backend/`: the Cloudflare Worker (RDAP domain age and IP owner, shortener expansion). Own package and tests; `cd backend && npm test`. Wrangler needs Node 22.
 - `src/parse/msgreader.js` must import `./buffer-shim.js` before msgreader, which expects Node's `Buffer` global.
 
 ## Testing

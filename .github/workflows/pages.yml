@@ -30,6 +30,9 @@ jobs:
       # Never deploy a build whose tests fail.
       - run: npm test
       - run: npm run build
+        env:
+          # Repository variable holding the deployed API Worker URL. Unset, the page shows network checks as unavailable.
+          VITE_API_URL: ${{ vars.API_URL }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

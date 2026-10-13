@@ -145,6 +145,7 @@ td a{color:var(--glow)}
 .toolrow{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
 .toolrow button{padding:7px 13px;font-size:.86rem}
 .note{color:var(--muted);font-size:.88rem;margin:8px 0 0}
+ul.sendlist{margin:8px 0 0;padding-left:20px;font-size:.9rem;overflow-wrap:anywhere}
 .ai-out{white-space:pre-wrap;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-top:12px;font-size:.96rem}
 .hashes{font:12px/1.6 "IBM Plex Mono",monospace;margin-top:10px;color:var(--muted);overflow-wrap:anywhere}
 .hashes b{color:var(--ink);font-weight:500}

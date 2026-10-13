@@ -27,7 +27,7 @@ function authRow(key, label, result, d){
     el('div', {class:'auth-name'}, label, el('span', {class:'auth-q', text:t.q})),
     el('div', {}, pill(sev, result ? result.toUpperCase() : 'Not found'), el('p', {text:expl})));
 }
-export function render(r){
+export function render(r, {scroll = true} = {}){
   const out = $('#results'); out.replaceChildren(); out.hidden = false;
   const mb = el('div', {class:'modebar', role:'group', 'aria-label':'View'});
   [['standard','Standard'],['inv','Investigator']].forEach(([m,l]) => {
@@ -53,7 +53,7 @@ export function render(r){
     reasons.length ? el('ul', {class:'reasons'}, reasons.map(f => el('li', {}, pill(f.sev), el('span', {text:f.title})))) : null
   ));
 
-  invBlocks(r).forEach(b => out.append(b));
+  invBlocks(r, () => render(r, {scroll:false})).forEach(b => out.append(b));
 
   out.append(block('The email', null, el('dl', {class:'kv'},
     el('dt', {text:'Subject'}), el('dd', {text:r.subject || '(none)'}),
@@ -136,7 +136,7 @@ export function render(r){
     r.bodyText ? el('details', {class:'raw'}, el('summary', {text:'Message text'}), el('pre', {text:r.bodyText})) : null,
     el('details', {class:'raw'}, el('summary', {text:`All headers (${r.headers.length})`}), pre)));
 
-  out.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start'});
+  if (scroll) out.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start'});
 }
 function hopTable(r){
   const utc = d => d ? d.toISOString().slice(11,19) : '-';
